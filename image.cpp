@@ -66,17 +66,46 @@ std::string byteImage(std::vector<unsigned char> img,int char_cols, int char_row
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
 
-     #ifdef _WIN32
+    #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8); // Enable UTF-8 output on Windows
     #endif
-    //std::string imgPath = "C:\\Media\\Atst.bmp";
+
     int char_cols = 40, char_rows = 20;
-    std::string imgPath = "C:\\Users\\soupt\\Downloads\\debu.jpg";
-    std::cout<< "Enter Image Path: ";
-    //std::cin>> imgPath;
+    std::string imgPath = "";
+    if (argc > 1 && std::string(argv[1]) == "--help")
+    {
+        std::cout
+            << "Usage:\n"
+            << "  imgconsole <image_path> [cols rows]\n"
+            << "Examples:\n"
+            << "  imgconsole cat.png\n"
+            << "  imgconsole cat.png 80 40\n";
+        return 0;
+    }
+    if (argc >= 2)
+    {
+        imgPath = argv[1];
+        if (argc >= 4){
+            try
+            {
+                char_cols = std::stoi(argv[2]);
+                char_rows = std::stoi(argv[3]);
+            }
+            catch (...)
+            {
+                std::cerr << "Invalid dimensions.\n";
+                return 1;
+            }
+        }
+    }
+    else
+    {
+        std::cout<< "Enter Image Path: ";
+        std::cin>> imgPath;
+    }
 
     int width,height,channel;
     unsigned char* data = stbi_load(imgPath.c_str(), &width, &height, &channel, 1);
@@ -84,7 +113,7 @@ int main()
     if(!data)
     {
         std::cerr<< "Failed to load image: " << imgPath << std::endl;
-        return 0;
+        return 1;
     }
 
     std::cout << "\n Width : "<< width;
@@ -97,7 +126,7 @@ int main()
 
     stbi_image_free(data);
 
-    //threshold(img,128);
+    threshold(img,128);
     std::string out =  byteImage(img,char_cols,char_rows,98);
     std::cout << std::endl << out << std::endl;
 
